@@ -1,0 +1,96 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<style type="text/css">
+  body {
+    background-color: #e2e2e2;
+  }
+
+  #app {
+    padding: 20px;
+  }
+
+  #preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #preview2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #preview img {
+    max-width: 100%;
+    max-height: 500px;
+  }
+  #preview2 img {
+    max-width: 100%;
+    max-height: 500px;
+  }
+</style>
+
+
+<div id="app">
+  <input type="file" ref="imgIDCard" name="imgIDCard" id="imgIDCard" @change="onFileChange" />
+
+  <div id="preview">
+    <img v-if="imgIDCard"    :src="imgIDCard" />
+  </div>
+  <input type="file" ref="imgSelfie" name="imgSelfie" id="imgSelfie" @change="onFileChange2" />
+
+  <div id="preview2">
+    <img v-if="imgSelfie"   :src="imgSelfie" />
+  </div>
+
+   <button v-on:click="submitFile()">Submit</button>
+</div>
+
+
+
+
+<script type="text/javascript">
+  let formData = new FormData();                                                                                            
+  const vm = new Vue({
+    el: '#app',
+    data() {                                          
+      return {
+        file:'',
+        file2:'',
+        imgIDCard: null,
+        imgSelfie: null
+      }
+    },
+    methods: {
+      onFileChange(e) {
+        const file = e.target.files[0];
+        this.imgIDCard = URL.createObjectURL(file);
+      formData.append('imgSelfie', e.target.files[0]);
+      
+      },
+      onFileChange2(e) {
+        const file2 = e.target.files[0];
+        this.imgSelfie = URL.createObjectURL(file2);
+        formData.append('imgIDCard', e.target.files[0]);
+      },      
+      submitFile(){
+            axios.post('http://localhost:9123/faceCompare',
+                formData,
+                {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+              }
+            ).then((data) => {
+              console.log(data);
+          console.log('SUCCESS!!');
+        })
+        .catch((e)=>{
+          console.log(e);
+          console.log('FAILURE!!');
+        });
+      },
+    }
+  })
+</script>
